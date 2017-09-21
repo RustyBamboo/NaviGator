@@ -39,7 +39,8 @@ def yaml_parse(yaml_text, navigator, total_time):
 
         if "mission_script" in mission.keys():
             mission_script = mission["mission_script"]
-            m = Mission(name, marker, min_time, weight, points, looking_for, num_mission_deps, mission_script=mission_script)
+            m = Mission(name, marker, min_time, weight, points, looking_for, num_mission_deps,
+                        mission_script=mission_script)
         else:
             m = Mission(name, marker, min_time, weight, points, looking_for, num_mission_deps)
         my_missions[name] = m

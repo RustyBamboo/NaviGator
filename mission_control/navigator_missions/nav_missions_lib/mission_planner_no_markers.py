@@ -155,7 +155,8 @@ class MissionPlanner:
         CALLED ASYNCHRONOUS
         """
         for mission in self.tree:
-            if self.can_complete(mission) and not self._is_in_queue(mission) and mission.name != self.current_mission_name:
+            if self.can_complete(mission) and not self._is_in_queue(mission) \
+                    and mission.name != self.current_mission_name:
                 fprint("mission: {}".format(mission.name), msg_color="blue", title="ADDING")
                 self.queue.put(mission)
 

@@ -1,4 +1,4 @@
-from txros import util, NodeHandle
+from txros import util
 from twisted.internet import defer
 from mil_misc_tools.text_effects import fprint
 

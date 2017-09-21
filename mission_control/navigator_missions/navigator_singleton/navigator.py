@@ -89,17 +89,22 @@ class Navigator(object):
 
         self._moveto_client = action.ActionClient(self.nh, 'move_to', MoveAction)
 
-        odom_set = lambda odom: setattr(self, 'pose', mil_tools.odometry_to_numpy(odom)[0])
+        def odom_set(odom):
+            return setattr(self, 'pose', mil_tools.odometry_to_numpy(odom)[0])
         self._odom_sub = self.nh.subscribe('odom', Odometry, odom_set)
-        enu_odom_set = lambda odom: setattr(self, 'ecef_pose', mil_tools.odometry_to_numpy(odom)[0])
+
+        def enu_odom_set(odom):
+            return setattr(self, 'ecef_pose', mil_tools.odometry_to_numpy(odom)[0])
         self._ecef_odom_sub = self.nh.subscribe('absodom', Odometry, enu_odom_set)
 
         try:
             self._database_query = self.nh.get_service_client('/database/requests', navigator_srvs.ObjectDBQuery)
-            self._camera_database_query = self.nh.get_service_client('/camera_database/requests', navigator_srvs.CameraDBQuery)
+            self._camera_database_query = self.nh.get_service_client(
+                '/camera_database/requests', navigator_srvs.CameraDBQuery)
             self._change_wrench = self.nh.get_service_client('/wrench/select', MuxSelect)
         except AttributeError, err:
-            fprint("Error getting service clients in nav singleton init: {}".format(err), title="NAVIGATOR", msg_color='red')
+            fprint("Error getting service clients in nav singleton init: {}".format(
+                err), title="NAVIGATOR", msg_color='red')
 
         self.tf_listener = tf.TransformListener(self.nh)
 
@@ -251,8 +256,10 @@ class Navigator(object):
 
     @util.cancellableInlineCallbacks
     def _make_alarms(self):
-        self.odom_loss_listener = yield TxAlarmListener.init(self.nh, 'odom-kill', lambda alarm: setattr(self, 'odom_loss', alarm.raised))
-        self.kill_listener = yield TxAlarmListener.init(self.nh, 'kill',lambda alarm: setattr(self, 'killed', alarm.raised))
+        self.odom_loss_listener = yield TxAlarmListener.init(self.nh, 'odom-kill',
+                                                             lambda alarm: setattr(self, 'odom_loss', alarm.raised))
+        self.kill_listener = yield TxAlarmListener.init(self.nh, 'kill',
+                                                        lambda alarm: setattr(self, 'killed', alarm.raised))
         fprint("Alarm listener created, listening to alarms: ", title="NAVIGATOR")
 
         self.killed = yield self.kill_listener.is_raised()
@@ -298,7 +305,7 @@ class MissionParam(object):
     def get(self, raise_exception=True):
         # Returns deferred object, make sure to yield on this (same for below)
         if not (yield self.exists()):
-            if not self.default == None:
+            if self.default is not None:
                 yield self.set(self.default)
                 defer.returnValue(self.default)
             if raise_exception:
@@ -335,7 +342,7 @@ class MissionParam(object):
     @util.cancellableInlineCallbacks
     def reset(self):
         if (yield self.exists()):
-            if not self.default == None:
+            if self.default is not None:
                 yield self.set(self.default)
             else:
                 yield self.nh.delete_param(self.param)
@@ -351,7 +358,7 @@ class Searcher(object):
     def __init__(self, nav, search_pattern=None, looker=None, vision_proxy="test", **kwargs):
         self.nav = nav
         self.looker = looker
-        if looker == None:
+        if looker is None:
             self.looker = self._vision_proxy_look
             self.vision_proxy = vision_proxy
         self.looker_kwargs = kwargs
@@ -405,7 +412,7 @@ class Searcher(object):
         Look around using the search pattern.
         If `loop` is true, then keep iterating over the list until timeout is reached or we find it.
         '''
-        if self.search_pattern == None:
+        if self.search_pattern is None:
             return
 
         def pattern():

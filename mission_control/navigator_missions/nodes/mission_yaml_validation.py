@@ -3,7 +3,6 @@ import yaml
 import os
 import nav_missions
 from graphviz import Digraph
-from navigator_msgs.msg import PerceptionObject
 
 
 class MissionYAMLValidation(object):
@@ -58,6 +57,7 @@ class MissionYAMLValidation(object):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         gv_file = dir_path + "/graph_validations/Missions.gv"
         self.dot.render(gv_file)
+
 
 if __name__ == "__main__":
     yaml_text = None

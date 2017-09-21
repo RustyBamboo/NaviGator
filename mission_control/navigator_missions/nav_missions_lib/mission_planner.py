@@ -137,7 +137,8 @@ class MissionPlanner:
         if hasattr(err, "type") and err.type == defer.CancelledError:  # This means there was a timeout
             fprint(self.current_mission.name, msg_color="red", title="MISSION TIMEOUT")
             yield self.publish("TimingOut")
-            if (TimeoutManager.can_repeat(self.missions_left, self._get_time_left(), self.current_mission)) or len(self.missions_left) == 1:
+            if (TimeoutManager.can_repeat(self.missions_left, self._get_time_left(), self.current_mission)) \
+                    or len(self.missions_left) == 1:
                 yield self.publish("Retrying")
                 self.failed = False
                 self.current_mission.timeout = self.current_mission.min_time
@@ -162,7 +163,8 @@ class MissionPlanner:
     def _monitor_timeouts(self):
         while len(self.tree) != 0:
             yield self.nh.sleep(.1)
-            if self.current_mission is None or self.current_mission.start_time is None or self.current_mission.timeout is None:
+            if self.current_mission is None or self.current_mission.start_time is None \
+                    or self.current_mission.timeout is None:
                 continue
             # print (self.nh.get_time() - self.current_mission.start_time).to_sec()
             # print self.current_mission.name
@@ -190,5 +192,6 @@ class MissionPlanner:
             print m.name
             yield self._run_mission(m)
 
-        fprint("MISSIONS COMPLETE, TOTAL RUN TIME: {}".format((self.nh.get_time() - self.start_time).to_sec()), msg_color="green")
+        fprint("MISSIONS COMPLETE, TOTAL RUN TIME: {}".format(
+            (self.nh.get_time() - self.start_time).to_sec()), msg_color="green")
         fprint("MISSIONS COMPLETE, TOTAL POINTS: {}".format((self.points), msg_color="green"))
